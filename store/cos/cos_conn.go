@@ -2,11 +2,11 @@ package cos
 
 import (
 	"context"
+	"github.com/kuan525/netdisk/config"
 	"github.com/tencentyun/cos-go-sdk-v5"
 	"log"
 	"net/http"
 	"net/url"
-	"netdisk/config"
 	"time"
 )
 

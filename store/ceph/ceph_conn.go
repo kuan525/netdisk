@@ -1,9 +1,9 @@
 package ceph
 
 import (
+	"github.com/kuan525/netdisk/config"
 	"gopkg.in/amz.v1/aws"
 	"gopkg.in/amz.v1/s3"
-	"netdisk/config"
 )
 
 var cephConn *s3.S3
