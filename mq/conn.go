@@ -1,9 +1,9 @@
 package mq
 
 import (
+	"github.com/kuan525/netdisk/config"
 	"github.com/streadway/amqp"
 	"log"
-	"netdisk/config"
 )
 
 var conn *amqp.Connection

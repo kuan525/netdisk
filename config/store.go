@@ -1,7 +1,7 @@
 package config
 
 import (
-	cmn "netdisk/common"
+	cmn "github.com/kuan525/netdisk/common"
 )
 
 const (

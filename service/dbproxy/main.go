@@ -2,14 +2,15 @@ package main
 
 import (
 	dbRpc "dbproxy/rpc"
+	"github.com/kuan525/netdisk/common"
+	"github.com/kuan525/netdisk/config"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	_ "github.com/micro/go-plugins/registry/kubernetes"
 	"log"
-	"netdisk/common"
-	"netdisk/dbclient/config"
-	dbConn "netdisk/dbclient/conn"
-	dbproto "netdisk/dbclient/proto"
+
+	dbConn "github.com/kuan525/netdisk/dbclient/conn"
+	dbproto "github.com/kuan525/netdisk/dbclient/proto"
 	"time"
 )
 

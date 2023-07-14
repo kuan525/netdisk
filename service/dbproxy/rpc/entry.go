@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"netdisk/dbclient/mapper"
-	"netdisk/dbclient/orm"
-	dbProxy "netdisk/dbclient/proto"
+	"github.com/kuan525/netdisk/dbclient/mapper"
+	"github.com/kuan525/netdisk/dbclient/orm"
+	dbProxy "github.com/kuan525/netdisk/dbclient/proto"
 )
 
 // DBProxy 结构体

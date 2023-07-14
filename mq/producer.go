@@ -1,8 +1,8 @@
 package mq
 
 import (
+	"github.com/kuan525/netdisk/config"
 	"github.com/streadway/amqp"
-	"netdisk/config"
 )
 
 // Publish 发布消息
