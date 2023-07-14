@@ -3,9 +3,17 @@ package api
 import (
 	"bytes"
 	"github.com/gin-gonic/gin"
+	cmn "github.com/kuan525/netdisk/common"
+	cfg "github.com/kuan525/netdisk/config"
+	dbcli "github.com/kuan525/netdisk/dbclient"
+	"github.com/kuan525/netdisk/store/ceph"
+	"github.com/kuan525/netdisk/util"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"time"
 )
 
 // DoUploadHandler 处理文件上传
@@ -38,7 +46,7 @@ func DoUploadHandler(c *gin.Context) {
 	defer file.Close()
 
 	// 2. 把文件内容转为[]byte
-	buf := bytes.NewReader(nil)
+	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
 		log.Printf("Failed to get file data, err:%s\n", err.Error())
 		errCode = -2
@@ -46,5 +54,45 @@ func DoUploadHandler(c *gin.Context) {
 	}
 
 	// TODO 3. 构建文件元信息
+	fileMeta := dbcli.FileMeta{
+		FileName: head.Filename,
+		FileSha1: util.Sha1(buf.Bytes()), // 计算文件sha1
+		FileSize: int64(len(buf.Bytes())),
+		UploadAt: time.Now().Format("2006-01-02 15:04:05"),
+	}
 
+	// 4. 将文件写入临时存储位置
+	fileMeta.Location = cfg.TempLocalRootDir + fileMeta.FileSha1 // 临时存储地址
+	newFile, err := os.Create(fileMeta.Location)
+	if err != nil {
+		log.Printf("Failed to create file, err:%s\n", err.Error())
+		errCode = -3
+		return
+	}
+	defer newFile.Close()
+
+	nByte, err := newFile.Write(buf.Bytes())
+	if int64(nByte) != fileMeta.FileSize || err != nil {
+		log.Printf("Failed to save data into file, writtenSize:%d, err:%s\n", nByte, err.Error())
+		errCode = -4
+		return
+	}
+
+	// 5. 同步或异步将文件转移到Ceph/COS
+	newFile.Seek(0, 0) // 游标重新回到文件头部
+	if cfg.CurrentStoreType == cmn.StoreCeph {
+		// 文件写入Ceph存储
+		data, _ := ioutil.ReadAll(newFile)
+		cephPath := cfg.CephRootDir + fileMeta.FileSha1
+		_ = ceph.PutObject("userfile", cephPath, data)
+		fileMeta.Location = cephPath
+	} else if cfg.CurrentStoreType == cmn.StoreCOS {
+		// 文件写入cos存储
+		cosPath := cfg.COSRootDir + fileMeta.FileSha1
+		// 判断写入cos为同步还是异步
+		if !cfg.AsyncTransferEnable {
+			// TODO 设置cos中的文件名，方便指定文件名下载
+			//cos.NewClient().B
+		}
+	}
 }
