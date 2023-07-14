@@ -40,7 +40,7 @@ func GetCephBucket(bucket string) *s3.Bucket {
 	return conn.Bucket(bucket)
 }
 
-// putObject 上传文件到ceph集群
-func putObject(bucket string, path string, data []byte) error {
+// PutObject 上传文件到ceph集群
+func PutObject(bucket string, path string, data []byte) error {
 	return GetCephBucket(bucket).Put(path, data, "octet-stream", s3.PublicRead)
 }
