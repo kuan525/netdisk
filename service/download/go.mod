@@ -3,6 +3,7 @@ module download
 go 1.19
 
 replace (
+	dbclient/orm => ../../dbclient/orm
 	google.golang.org/grpc => google.golang.org/grpc v1.26.0
 	netdisk/common => ../../common
 	netdisk/dbclient => ../../dbclient
@@ -15,6 +16,7 @@ require (
 )
 
 require (
+	dbclient/orm v0.0.0-00010101000000-000000000000 // indirect
 	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/cheekybits/genny v1.0.0 // indirect

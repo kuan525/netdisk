@@ -22,6 +22,6 @@ func DownloadURLHandler(c *gin.Context) {
 		return
 	}
 
-	tblFile := dbcli.ToTableFile(dbResp.Data)
+	tblFile := dbcli.ToTableFile(dbResp.)
 
 }
