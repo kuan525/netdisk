@@ -43,7 +43,7 @@ func DownloadURLHandler(c *gin.Context) {
 		// cos下载url
 		signedURL := cos.DownloadURL(tblFile.FileAddr.String)
 		log.Println(tblFile.FileAddr.String)
-		c.Data(http.StatusOK, "spplication/octet-stream", []byte(signedURL))
+		c.Data(http.StatusOK, "application/octet-stream", []byte(signedURL))
 	}
 }
 
