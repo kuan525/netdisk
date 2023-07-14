@@ -1,8 +1,8 @@
 package mapper
 
 import (
-	"dbclient/orm"
 	"errors"
+	"github.com/kuan525/netdisk/dbclient/orm"
 	"reflect"
 )
 

@@ -1,7 +1,7 @@
 package orm
 
 import (
-	mydb "dbclient/conn"
+	mydb "github.com/kuan525/netdisk/dbclient/conn"
 	"log"
 )
 

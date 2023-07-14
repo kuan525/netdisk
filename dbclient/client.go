@@ -6,9 +6,9 @@ import (
 	"github.com/micro/go-micro"
 	"github.com/mitchellh/mapstructure"
 
-	dbProto "dbclient/proto"
+	dbProto "github.com/kuan525/netdisk/dbclient/proto"
 
-	"dbclient/orm"
+	"github.com/kuan525/netdisk/dbclient/orm"
 )
 
 // FileMeta : 文件元信息结构

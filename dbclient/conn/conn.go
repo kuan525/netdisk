@@ -2,9 +2,9 @@ package conn
 
 import (
 	"database/sql"
-	cfg "dbclient/config"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	cfg "github.com/kuan525/netdisk/dbclient/config"
 	"log"
 	"os"
 )
