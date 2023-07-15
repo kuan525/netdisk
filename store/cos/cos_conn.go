@@ -12,6 +12,14 @@ import (
 
 var cosCli *cos.Client
 
+// Client 获取cosCli对象
+func Client() *cos.Client {
+	if cosCli != nil {
+		return cosCli
+	}
+	return NewClient()
+}
+
 // NewClient 创建cos client对象
 func NewClient() *cos.Client {
 	u, _ := url.Parse(config.BucketURL)
