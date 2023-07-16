@@ -1,9 +1,9 @@
 package route
 
 import (
-	"download/api"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/kuan525/netdisk/service/download/api"
 )
 
 // Router 路由表配置

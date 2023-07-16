@@ -2,11 +2,16 @@ package api
 
 import (
 	"bytes"
+	"context"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	cmn "github.com/kuan525/netdisk/common"
 	cfg "github.com/kuan525/netdisk/config"
 	dbcli "github.com/kuan525/netdisk/dbclient"
+	"github.com/kuan525/netdisk/dbclient/orm"
+	"github.com/kuan525/netdisk/mq"
 	"github.com/kuan525/netdisk/store/ceph"
+	"github.com/kuan525/netdisk/store/cos"
 	"github.com/kuan525/netdisk/util"
 	"io"
 	"io/ioutil"
@@ -93,6 +98,91 @@ func DoUploadHandler(c *gin.Context) {
 		if !cfg.AsyncTransferEnable {
 			// TODO 设置cos中的文件名，方便指定文件名下载
 			//cos.NewClient().B
+			_, err := cos.Client().Object.Put(context.Background(), cosPath, newFile, nil)
+			if err != nil {
+				log.Println(err.Error())
+				errCode = -5
+				return
+			}
+			fileMeta.Location = cosPath
+		} else {
+			// 写入异步转移任务队列
+			data := mq.TransferData{
+				FileHash:      fileMeta.FileSha1,
+				CurLocation:   fileMeta.Location,
+				DestLocation:  cosPath,
+				DestStoreType: cmn.StoreCOS,
+			}
+			pubData, _ := json.Marshal(data)
+			puSuc := mq.Publish(
+				cfg.TranExchangeName,
+				cfg.TransCOSRoutingKey,
+				pubData,
+			)
+			if !puSuc {
+				// TODO 当前发送转移信息失败，稍后重试
+			}
 		}
 	}
+
+	// 6. 更新文件表记录
+	_, err = dbcli.OnFileUploadFinished(fileMeta)
+	if err != nil {
+		errCode = -6
+		return
+	}
+
+	// 7. 更新用户文件表
+	username := c.Request.FormValue("username")
+	upRes, err := dbcli.OnUserFileUploadFinished(username, fileMeta)
+	if err != nil && upRes.Suc {
+		errCode = 0
+	} else {
+		errCode = -6
+	}
+}
+
+// TryFastUploadHandler 尝试秒传接口
+func TryFastUploadHandler(c *gin.Context) {
+	// 1. 解析请求参数
+	username := c.Request.FormValue("username")
+	filehash := c.Request.FormValue("filehash")
+	filename := c.Request.FormValue("filename")
+
+	// 2. 从文件表中查询相同的hash的文件记录
+	fileMetaResp, err := dbcli.GetFileMeta(filehash)
+	if err != nil {
+		log.Println(err.Error())
+		c.Status(http.StatusInternalServerError)
+		return
+	}
+
+	// 3. 查不到记录则返回妙传失败
+	if !fileMetaResp.Suc {
+		resp := util.RespMsg{
+			Code: -1,
+			Msg:  "妙传失败，请访问普通上传接口",
+		}
+		c.Data(http.StatusOK, "application/json", resp.JSONBytes())
+		return
+	}
+
+	// 4. 上传过则将文件信息写入用户文件表，返回成功
+	fmeta := dbcli.TableFileToFileMeta(fileMetaResp.Data.(orm.TableFile))
+	fmeta.FileName = filename
+	upRes, err := dbcli.OnUserFileUploadFinished(username, fmeta)
+	if err != nil && upRes.Suc {
+		resp := util.RespMsg{
+			Code: 0,
+			Msg:  "妙传成功",
+		}
+		c.Data(http.StatusOK, "application/json", resp.JSONBytes())
+		return
+	}
+	resp := util.RespMsg{
+		Code: -2,
+		Msg:  "妙传失败，请稍后重试",
+	}
+	c.Data(http.StatusOK, "application/json", resp.JSONBytes())
+	return
 }

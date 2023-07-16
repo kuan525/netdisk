@@ -2,8 +2,8 @@ package rpc
 
 import (
 	"context"
-	cfg "download/config"
 	dlProto "github.com/kuan525/netdisk/proto/download"
+	cfg "github.com/kuan525/netdisk/service/download/config"
 )
 
 type Download struct{}

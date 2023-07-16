@@ -3,8 +3,8 @@ package rpc
 import (
 	"context"
 
-	cfg "upload/config"
-	upProto "upload/proto"
+	upProto "github.com/kuan525/netdisk/proto/upload"
+	cfg "github.com/kuan525/netdisk/service/upload/config"
 )
 
 type Upload struct{}

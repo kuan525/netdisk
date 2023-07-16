@@ -1,12 +1,19 @@
 package main
 
 import (
+	"fmt"
+	"github.com/kuan525/netdisk/common"
+	cfg "github.com/kuan525/netdisk/config"
+	dbcli "github.com/kuan525/netdisk/dbclient"
+	"github.com/kuan525/netdisk/mq"
+	upProto "github.com/kuan525/netdisk/proto/upload"
+	upRpc "github.com/kuan525/netdisk/service/upload/rpc"
 	"github.com/micro/cli"
 	micro "github.com/micro/go-micro"
 	"log"
-	"netdisk/common"
-	"netdisk/mq"
+	"os"
 	"time"
+	"upload/route"
 )
 
 func startRPCService() {
@@ -27,4 +34,27 @@ func startRPCService() {
 		}))
 
 	// 初始化dbproxy client
+	dbcli.Init(service)
+	mq.Init()
+
+	upProto.RegisterUploadServiceHandler(service.Server(), new(upRpc.Upload))
+	if err := service.Run(); err != nil {
+		fmt.Println(err.Error())
+	}
+}
+
+func startAPIService() {
+	router := route.Router()
+	router.Run(cfg.UploadServiceHost)
+}
+
+func main() {
+	os.MkdirAll(cfg.TempLocalRootDir, 0744)
+	os.MkdirAll(cfg.TempPartRootDir, 0744)
+
+	// api服务
+	go startAPIService()
+
+	// rpc 服务
+	startAPIService()
 }
