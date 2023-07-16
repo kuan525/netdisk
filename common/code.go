@@ -4,7 +4,7 @@ type ErrorCode int32
 
 // 状态码从10000开始
 const (
-	_ ErrorCode = iota + 9999
+	_ int32 = iota + 9999
 	// StatusOk 正常
 	StatusOk
 	// StatusParamInvalid 请求参数无效
