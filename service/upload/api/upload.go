@@ -161,7 +161,7 @@ func TryFastUploadHandler(c *gin.Context) {
 	if !fileMetaResp.Suc {
 		resp := util.RespMsg{
 			Code: -1,
-			Msg:  "妙传失败，请访问普通上传接口",
+			Msg:  "秒传失败，请访问普通上传接口",
 		}
 		c.Data(http.StatusOK, "application/json", resp.JSONBytes())
 		return
@@ -174,14 +174,14 @@ func TryFastUploadHandler(c *gin.Context) {
 	if err != nil && upRes.Suc {
 		resp := util.RespMsg{
 			Code: 0,
-			Msg:  "妙传成功",
+			Msg:  "秒传成功",
 		}
 		c.Data(http.StatusOK, "application/json", resp.JSONBytes())
 		return
 	}
 	resp := util.RespMsg{
 		Code: -2,
-		Msg:  "妙传失败，请稍后重试",
+		Msg:  "秒传失败，请稍后重试",
 	}
 	c.Data(http.StatusOK, "application/json", resp.JSONBytes())
 	return
