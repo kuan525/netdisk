@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+
 	dlProto "github.com/kuan525/netdisk/proto/download"
 	cfg "github.com/kuan525/netdisk/service/download/config"
 )
@@ -12,8 +13,8 @@ type Download struct{}
 func (u *Download) DownloadEntry(
 	ctx context.Context,
 	req *dlProto.ReqEntry,
-	res *dlProto.RespEntry) {
+	res *dlProto.RespEntry) error {
 
 	res.Entry = cfg.DownloadEntry
-	return
+	return nil
 }
