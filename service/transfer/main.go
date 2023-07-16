@@ -8,7 +8,6 @@ import (
 	"github.com/kuan525/netdisk/mq"
 	"github.com/kuan525/netdisk/service/transfer/process"
 	"github.com/micro/cli"
-	"github.com/micro/go-micro"
 	"log"
 	"time"
 )
@@ -38,7 +37,7 @@ func startRPCService() {
 	}
 }
 
-func startTranserService() {
+func startTransferService() {
 	if !config.AsyncTransferEnable {
 		log.Println("异步转移文件功能目前被禁用，请检查相关配置")
 		return
@@ -53,7 +52,7 @@ func startTranserService() {
 
 func main() {
 	// 文件转移服务
-	go startTranserService()
+	go startTransferService()
 
 	// rpc服务
 	startRPCService()
