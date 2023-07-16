@@ -10,7 +10,6 @@ import (
 	dlRpc "github.com/kuan525/netdisk/service/download/rpc"
 	"github.com/micro/go-micro"
 	"time"
-	"upload/route"
 )
 
 func startRPCService() {
