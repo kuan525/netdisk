@@ -8,6 +8,7 @@ import (
 	"github.com/kuan525/netdisk/mq"
 	"github.com/kuan525/netdisk/service/transfer/process"
 	"github.com/micro/cli"
+	"github.com/micro/go-micro"
 	"log"
 	"time"
 )
