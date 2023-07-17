@@ -3,10 +3,9 @@ package dbclient
 import (
 	"context"
 	"encoding/json"
-	"github.com/micro/go-micro"
-	"github.com/mitchellh/mapstructure"
-
 	dbProto "github.com/kuan525/netdisk/dbclient/proto"
+	micro "github.com/micro/micro/v3/service"
+	"github.com/mitchellh/mapstructure"
 
 	"github.com/kuan525/netdisk/dbclient/orm"
 )
@@ -24,9 +23,9 @@ var (
 	dbCli dbProto.DBProxyService
 )
 
-func Init(service micro.Service) {
+func Init(srv micro.Service) {
 	// 初始化一个dbproxy服务的客户端
-	dbCli = dbProto.NewDBProxyService("go.micro.service.dbproxy", service.Client())
+	dbCli = dbProto.NewDBProxyService("go.micro.service.dbproxy", srv.Client())
 }
 
 func TableFileToFileMeta(tfile orm.TableFile) FileMeta {

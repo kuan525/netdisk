@@ -19,6 +19,6 @@
 > 
 > protoc-gen-go v1.28.1
 > 
-> protoc-gen-micro v3
+> protoc-gen-micro v3.19.1
 > 
 > micro: `go install github.com/micro/micro/v3/cmd/protoc-gen-micro@master`
