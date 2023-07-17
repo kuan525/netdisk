@@ -11,7 +11,7 @@ const (
 	TempPartRootDir = "/data/netdisk_part/"
 	// CephRootDir Ceph的存储路径
 	CephRootDir = "/ceph"
-	// COSRootDir OCS的存储路径prefix
+	// COSRootDir COS的存储路径prefix
 	COSRootDir = "cos/"
 	// CurrentStoreType 设置当前文件的存储类型
 	CurrentStoreType = cmn.StoreLocal

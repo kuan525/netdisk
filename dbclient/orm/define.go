@@ -5,6 +5,8 @@ import "database/sql"
 // TableFile 文件表结构体
 type TableFile struct {
 	FileHash string
+	// 多了一个判断是否有效的情况
+	// 默认就部位空的时候，可以使用string，但是可能为空的时候最好使用sql.NullString
 	FileName sql.NullString
 	FileSize sql.NullInt64
 	FileAddr sql.NullString

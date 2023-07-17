@@ -3,4 +3,5 @@
 .vscode/
 go.mod
 go.sum
-
+deploy/
+doc/
