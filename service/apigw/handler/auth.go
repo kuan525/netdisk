@@ -27,7 +27,7 @@ func Authorize() gin.HandlerFunc {
 
 		// 验证登陆token是否有效
 		if len(username) < 3 || !IsTokenValid(token) {
-			// token 校验失败则跳转到登陆页面
+			// token 校验失败则跳转到登陆页面,Abort阻止后面的流程
 			c.Abort()
 			resp := util.NewRespMsg(
 				int(common.StatusTokenInvalid),

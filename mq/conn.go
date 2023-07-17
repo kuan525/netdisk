@@ -6,10 +6,11 @@ import (
 	"log"
 )
 
-var conn *amqp.Connection
-var channel *amqp.Channel
-
-var notifyClose chan *amqp.Error
+var (
+	conn        *amqp.Connection
+	channel     *amqp.Channel
+	notifyClose chan *amqp.Error
+)
 
 // Init 初始化mq连接信息
 func Init() {

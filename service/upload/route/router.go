@@ -26,7 +26,7 @@ func Router() *gin.Engine {
 		// AllowCredentials: true,
 	}))
 
-	//文件上传相关接口
+	// 文件上传相关接口
 	router.POST("/file/upload", api.DoUploadHandler)
 
 	// 秒传接口

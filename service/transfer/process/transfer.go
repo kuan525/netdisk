@@ -34,6 +34,7 @@ func Transfer(msg []byte) bool {
 		return false
 	}
 
+	// 更新文件位置
 	resp, err := dbcli.UpdateFileLocation(pubData.FileHash, pubData.DestLocation)
 	if err != nil {
 		log.Println(err.Error())

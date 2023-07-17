@@ -28,12 +28,13 @@ func (b *binaryFileSystem) Exists(prefix string, filepath string) bool {
 	return false
 }
 
+// BinaryFileSystem 返回asset封装的静态资源对象
 func BinaryFileSystem(root string) *binaryFileSystem {
 	fs := &assetfs.AssetFS{
-		Asset:     asset.Asset,
-		AssetDir:  asset.AssetDir,
-		AssetInfo: asset.AssetInfo,
-		Prefix:    root,
+		Asset:     asset.Asset,     // 获取文件内容
+		AssetDir:  asset.AssetDir,  // 获取目录列表
+		AssetInfo: asset.AssetInfo, // 获取文件信息
+		Prefix:    root,            // 文件系统的根路径
 	}
 	return &binaryFileSystem{
 		fs,
@@ -60,7 +61,7 @@ func Router() *gin.Engine {
 	// 用户查询
 	router.POST("/user/info", handler.UserInfoHandler)
 
-	// 用不文件查询
+	// 用户文件查询
 	router.POST("/file/query", handler.FileQueryHandler)
 	// 用户文件修改（重命名）
 	router.POST("/file/update", handler.FileMetaUpdateHandler)

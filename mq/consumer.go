@@ -12,7 +12,7 @@ func StartConsume(qName, cName string, callback func(msg []byte) bool) {
 		true,  // 自动应答
 		false, // 非唯一的消费者
 		false, // rabbitMQ只能设置为false
-		false, // noWait， false表示回阻塞直到有消息过来
+		false, // noWait， false表示会阻塞直到有消息过来
 		nil)
 	if err != nil {
 		log.Fatal(err.Error(), "接受消息失败")
