@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	dbcli "github.com/kuan525/netdisk/dbclient"
+	"github.com/kuan525/netdisk/client/dbproxy"
 	"github.com/kuan525/netdisk/mq"
 	"github.com/kuan525/netdisk/store/cos"
 	"log"
@@ -13,6 +13,9 @@ import (
 
 // Transfer 处理文件转移
 func Transfer(msg []byte) bool {
+	dbClient := dbproxy.NewDbProxyClient()
+	defer dbClient.Conn.Close()
+
 	log.Println(string(msg))
 
 	pubData := mq.TransferData{}
@@ -35,7 +38,7 @@ func Transfer(msg []byte) bool {
 	}
 
 	// 更新文件位置
-	resp, err := dbcli.UpdateFileLocation(pubData.FileHash, pubData.DestLocation)
+	resp, err := dbClient.UpdateFileLocation(pubData.FileHash, pubData.DestLocation)
 	if err != nil {
 		log.Println(err.Error())
 		return false

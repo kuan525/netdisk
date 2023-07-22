@@ -1,31 +1,47 @@
 package main
 
 import (
-	"account/handler"
-	"github.com/kuan525/netdisk/common"
-	dbcli "github.com/kuan525/netdisk/dbclient"
-	accProto "github.com/kuan525/netdisk/proto/account"
-	"github.com/micro/go-micro"
-	"log"
-	"time"
+	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/hashicorp/consul/api"
+	userProto "github.com/kuan525/netdisk/client/account/proto"
+	"github.com/kuan525/netdisk/service/account/handler"
+	"os"
 )
 
 func main() {
-	service := micro.NewService(
-		micro.Name("go.micro.service.user"),
-		micro.RegisterTTL(time.Second*10),
-		micro.RegisterInterval(time.Second*5),
-		micro.Flags(common.CustomFlags...),
+	logger := log.NewStdLogger(os.Stdout)
+	log := log.NewHelper(logger)
+
+	consulClient, err := api.NewClient(api.DefaultConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	grpcSrv := grpc.NewServer(
+		//grpc.Address(":9000"),
+		grpc.Middleware(
+			recovery.Recovery(),
+			logging.Server(logger),
+		),
 	)
 
-	// 初始化service，解析命令行参数等
-	service.Init()
+	userProto.RegisterUserServiceServer(grpcSrv, new(handler.User))
 
-	// 初始化dbclient
-	dbcli.Init(service)
+	r := consul.New(consulClient)
+	app := kratos.New(
+		kratos.Name("go.micro.service.user"),
+		kratos.Server(
+			grpcSrv,
+		),
+		kratos.Registrar(r),
+	)
 
-	accProto.RegisterUserServiceHandler(service.Server(), new(handler.User))
-	if err := service.Run(); err != nil {
-		log.Println(err.Error())
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
 	}
 }

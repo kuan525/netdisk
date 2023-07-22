@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	rPool "github.com/kuan525/netdisk/cache/redis"
+	"github.com/kuan525/netdisk/client/dbproxy"
 	"github.com/kuan525/netdisk/config"
-	dbcli "github.com/kuan525/netdisk/dbclient"
 	"github.com/kuan525/netdisk/util"
 	"log"
 	"math"
@@ -116,6 +116,9 @@ func UploadPartHandler(c *gin.Context) {
 }
 
 func CompleteUploadHandler(c *gin.Context) {
+	dbClient := dbproxy.NewDbProxyClient()
+	defer dbClient.Conn.Close()
+
 	// 1. 解析请求参数
 	upid := c.Request.FormValue("uploadid")
 	username := c.Request.FormValue("username")
@@ -177,14 +180,14 @@ func CompleteUploadHandler(c *gin.Context) {
 	// 4. 更新唯一文件表以及用户文件表
 	fsize, _ := strconv.Atoi(filesize)
 
-	fmeta := dbcli.FileMeta{
+	fmeta := dbproxy.FileMeta{
 		FileSha1: filehash,
 		FileName: filename,
 		FileSize: int64(fsize),
 		Location: destPath,
 	}
-	_, ferr := dbcli.OnFileUploadFinished(fmeta)
-	_, uferr := dbcli.OnUserFileUploadFinished(username, fmeta)
+	_, ferr := dbClient.OnFileUploadFinished(fmeta)
+	_, uferr := dbClient.OnUserFileUploadFinished(username, fmeta)
 	if ferr != nil || uferr != nil {
 		log.Println(err.Error())
 		c.JSON(

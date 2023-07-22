@@ -3,9 +3,9 @@ package api
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/kuan525/netdisk/client/dbproxy"
 	"github.com/kuan525/netdisk/common"
 	cfg "github.com/kuan525/netdisk/config"
-	dbcli "github.com/kuan525/netdisk/dbclient"
 	"github.com/kuan525/netdisk/store/ceph"
 	"github.com/kuan525/netdisk/store/cos"
 	"log"
@@ -15,10 +15,13 @@ import (
 
 // DownloadURLHandler 生成文件的下载地址
 func DownloadURLHandler(c *gin.Context) {
+	dbClient := dbproxy.NewDbProxyClient()
+	defer dbClient.Conn.Close()
+
 	filehash := c.Request.FormValue("filehash")
 
 	// 从文件表查找记录
-	dbResp, err := dbcli.GetFileMeta(filehash)
+	dbResp, err := dbClient.GetFileMeta(filehash)
 	if err != nil {
 		c.JSON(
 			http.StatusOK,
@@ -29,7 +32,7 @@ func DownloadURLHandler(c *gin.Context) {
 		return
 	}
 
-	tblFile := dbcli.ToTableFile(dbResp.Data)
+	tblFile := dbClient.ToTableFile(dbResp.Data)
 
 	// TODO 判断文件存在COS还是Ceph，还是在本地
 	if strings.HasPrefix(tblFile.FileAddr.String, cfg.TempLocalRootDir) ||
@@ -49,11 +52,14 @@ func DownloadURLHandler(c *gin.Context) {
 
 // DownloadHandler 文件下载接口
 func DownloadHandler(c *gin.Context) {
+	dbClient := dbproxy.NewDbProxyClient()
+	defer dbClient.Conn.Close()
+
 	fsha1 := c.Request.FormValue("filehash")
 	username := c.Request.FormValue("username")
 	// TODO 处理异常情况
-	fResp, ferr := dbcli.GetFileMeta(fsha1)
-	ufResp, uferr := dbcli.QueryUserFileMeta(username, fsha1)
+	fResp, ferr := dbClient.GetFileMeta(fsha1)
+	ufResp, uferr := dbClient.QueryUserFileMeta(username, fsha1)
 	if ferr != nil || uferr != nil || !fResp.Suc || !ufResp.Suc {
 		c.JSON(
 			http.StatusOK,
@@ -63,8 +69,8 @@ func DownloadHandler(c *gin.Context) {
 			})
 		return
 	}
-	uniqFile := dbcli.ToTableFile(fResp.Data)
-	userFile := dbcli.ToTableUserFile(ufResp.Data)
+	uniqFile := dbClient.ToTableFile(fResp.Data)
+	userFile := dbClient.ToTableUserFile(ufResp.Data)
 
 	if strings.HasPrefix(uniqFile.FileAddr.String, cfg.TempLocalRootDir) {
 		// 本地文件，直接下载

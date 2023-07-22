@@ -1,44 +1,53 @@
 package main
 
 import (
-	dbRpc "dbproxy/rpc"
-	"github.com/kuan525/netdisk/common"
-	"github.com/kuan525/netdisk/dbclient/config"
-	"github.com/micro/cli"
-	"github.com/micro/go-micro"
+	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/hashicorp/consul/api"
+	dbConn "github.com/kuan525/netdisk/service/dbproxy/conn"
+	dbRpc "github.com/kuan525/netdisk/service/dbproxy/rpc"
 	_ "github.com/micro/go-plugins/registry/kubernetes"
-	"log"
+	"os"
 
-	dbConn "github.com/kuan525/netdisk/dbclient/conn"
-	dbproto "github.com/kuan525/netdisk/dbclient/proto"
-	"time"
+	dbproto "github.com/kuan525/netdisk/client/dbproxy/proto"
 )
 
 func startRpcService() {
-	service := micro.NewService(
-		micro.Name("go.micro.service.dbproxy"), // 在注册中心中等服务名称
-		micro.RegisterTTL(time.Second*10),      // 声明超时时间，避免consul不主动删除掉已经失去心跳等服务节点
-		micro.RegisterInterval(time.Second*5),
-		micro.Flags(common.CustomFlags...),
-	)
+	logger := log.NewStdLogger(os.Stdout)
+	log := log.NewHelper(logger)
 
-	service.Init(
-		micro.Action(func(c *cli.Context) {
-			//检查是否指定dbhost
-			dbhost := c.String("dbhost")
-			if len(dbhost) > 0 {
-				log.Println("custom db address: " + dbhost)
-				config.UpdateDBHost(dbhost)
-			}
-		}),
+	consulClient, err := api.NewClient(api.DefaultConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	grpcSrv := grpc.NewServer(
+		//grpc.Address(":9000"), // 默认随机
+		grpc.Middleware(
+			recovery.Recovery(),
+			logging.Server(logger),
+		),
+	)
+	dbproto.RegisterDBProxyServiceServer(grpcSrv, new(dbRpc.DBProxy))
+
+	r := consul.New(consulClient)
+	app := kratos.New(
+		kratos.Name("go.micro.service.dbproxy"),
+		kratos.Server(
+			grpcSrv,
+		),
+		kratos.Registrar(r),
 	)
 
 	// 初始化db connection
 	dbConn.InitDBConn()
 
-	dbproto.RegisterDBProxyServiceHandler(service.Server(), new(dbRpc.DBProxy))
-	if err := service.Run(); err != nil {
-		log.Println(err.Error())
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
 

@@ -2,7 +2,7 @@ package orm
 
 import (
 	"database/sql"
-	mydb "github.com/kuan525/netdisk/dbclient/conn"
+	mydb "github.com/kuan525/netdisk/service/dbproxy/conn"
 	"log"
 )
 

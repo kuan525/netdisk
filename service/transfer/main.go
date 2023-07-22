@@ -1,49 +1,43 @@
 package transfer
 
 import (
-	"fmt"
-	"github.com/kuan525/netdisk/common"
+	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/hashicorp/consul/api"
 	"github.com/kuan525/netdisk/config"
-	dbcli "github.com/kuan525/netdisk/dbclient"
 	"github.com/kuan525/netdisk/mq"
 	"github.com/kuan525/netdisk/service/transfer/process"
-	"github.com/micro/cli"
-	"github.com/micro/go-micro"
-	"log"
-	"time"
+	"os"
 )
 
 func startRPCService() {
-	service := micro.NewService(
-		micro.Name("go.micro,service.transfer"),
-		micro.RegisterTTL(time.Second*10),
-		micro.RegisterInterval(time.Second*5),
-		micro.Flags(common.CustomFlags...),
-	)
-	service.Init(
-		micro.Action(func(c *cli.Context) {
-			mqhost := c.String("mqhost")
-			if len(mqhost) > 0 {
-				log.Println("custom mq address: " + mqhost)
-				mq.UpdateRabbitHost(mqhost)
-			}
-		}),
+	logger := log.NewStdLogger(os.Stdout)
+	log := log.NewHelper(logger)
+
+	consulClient, err := api.NewClient(api.DefaultConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	r := consul.New(consulClient)
+	app := kratos.New(
+		kratos.Name("go.micro.service.transfer"),
+		kratos.Server(),
+		kratos.Registrar(r),
 	)
 
-	// 初始化dbclient
-	dbcli.Init(service)
-
-	if err := service.Run(); err != nil {
-		fmt.Println(err.Error())
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
 
 func startTransferService() {
 	if !config.AsyncTransferEnable {
-		log.Println("异步转移文件功能目前被禁用，请检查相关配置")
+		log.Info("异步转移文件功能目前被禁用，请检查相关配置")
 		return
 	}
-	log.Println("文件转移服务启用中，开始监听转移任务队列")
+	log.Info("文件转移服务启用中，开始监听转移任务队列")
 
 	// 初始化mq client
 	mq.Init()

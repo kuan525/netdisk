@@ -4,16 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/kuan525/netdisk/dbclient/mapper"
-	"github.com/kuan525/netdisk/dbclient/orm"
-	dbProxy "github.com/kuan525/netdisk/dbclient/proto"
+	dbProxy "github.com/kuan525/netdisk/client/dbproxy/proto"
+	"github.com/kuan525/netdisk/service/dbproxy/mapper"
+	"github.com/kuan525/netdisk/service/dbproxy/orm"
 )
 
 // DBProxy 结构体
-type DBProxy struct{}
+type DBProxy struct {
+	dbProxy.UnimplementedDBProxyServiceServer
+}
 
 // ExecuteAction 请求执行sql函数
-func (db *DBProxy) ExecuteAction(ctx context.Context, req *dbProxy.ReqExec, res *dbProxy.RespExec) error {
+func (db *DBProxy) ExecuteAction(ctx context.Context, req *dbProxy.ReqExec) (res *dbProxy.RespExec, err error) {
 	resList := make([]orm.ExecResult, len(req.Action))
 
 	// TODO: 检查 req.Sequence req.Transaction两个参数，执行不同的流程
@@ -49,5 +51,5 @@ func (db *DBProxy) ExecuteAction(ctx context.Context, req *dbProxy.ReqExec, res 
 
 	// TODO： 处理异常
 	res.Data, _ = json.Marshal(resList)
-	return nil
+	return
 }

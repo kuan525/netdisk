@@ -1,32 +1,50 @@
 package main
 
 import (
-	"fmt"
-	"github.com/kuan525/netdisk/common"
-	dbcli "github.com/kuan525/netdisk/dbclient"
-	dlProto "github.com/kuan525/netdisk/proto/download"
+	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
+	"github.com/hashicorp/consul/api"
+	userProto "github.com/kuan525/netdisk/client/account/proto"
+	"github.com/kuan525/netdisk/service/account/handler"
 	cfg "github.com/kuan525/netdisk/service/download/config"
 	"github.com/kuan525/netdisk/service/download/route"
-	dlRpc "github.com/kuan525/netdisk/service/download/rpc"
-	"github.com/micro/go-micro"
-	"time"
+	"os"
 )
 
 func startRPCService() {
-	service := micro.NewService(
-		micro.Name("go.micro.service.download"),
-		micro.RegisterTTL(time.Second*10),
-		micro.RegisterInterval(time.Second*5),
-		micro.Flags(common.CustomFlags...),
+	logger := log.NewStdLogger(os.Stdout)
+	log := log.NewHelper(logger)
+
+	consulClient, err := api.NewClient(api.DefaultConfig())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	grpcSrv := grpc.NewServer(
+		//grpc.Address(":9000"),
+		grpc.Middleware(
+			recovery.Recovery(),
+			logging.Server(logger),
+		),
 	)
-	service.Init()
 
-	// 初始化dbclient
-	dbcli.Init(service)
+	userProto.RegisterUserServiceServer(grpcSrv, new(handler.User))
 
-	dlProto.RegisterDownloadServiceHandler(service.Server(), new(dlRpc.Download))
-	if err := service.Run(); err != nil {
-		fmt.Println(err.Error())
+	r := consul.New(consulClient)
+	app := kratos.New(
+		kratos.Name("go.micro.service.download"),
+		kratos.Server(
+			grpcSrv,
+		),
+		kratos.Registrar(r),
+	)
+
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
 	}
 }
 

@@ -5,11 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/kuan525/netdisk/client/dbproxy"
 	cmn "github.com/kuan525/netdisk/common"
 	cfg "github.com/kuan525/netdisk/config"
-	dbcli "github.com/kuan525/netdisk/dbclient"
-	"github.com/kuan525/netdisk/dbclient/orm"
 	"github.com/kuan525/netdisk/mq"
+	"github.com/kuan525/netdisk/service/dbproxy/orm"
 	"github.com/kuan525/netdisk/store/ceph"
 	"github.com/kuan525/netdisk/store/cos"
 	"github.com/kuan525/netdisk/util"
@@ -40,6 +40,8 @@ func DoUploadHandler(c *gin.Context) {
 			})
 		}
 	}()
+	dbClient := dbproxy.NewDbProxyClient()
+	defer dbClient.Conn.Close()
 
 	// 1. 从form表单中获得文件内容句柄
 	file, head, err := c.Request.FormFile("file")
@@ -59,7 +61,7 @@ func DoUploadHandler(c *gin.Context) {
 	}
 
 	// TODO 3. 构建文件元信息
-	fileMeta := dbcli.FileMeta{
+	fileMeta := dbproxy.FileMeta{
 		FileName: head.Filename,
 		FileSha1: util.Sha1(buf.Bytes()), // 计算文件sha1
 		FileSize: int64(len(buf.Bytes())),
@@ -126,7 +128,7 @@ func DoUploadHandler(c *gin.Context) {
 	}
 
 	// 6. 更新文件表记录
-	_, err = dbcli.OnFileUploadFinished(fileMeta)
+	_, err = dbClient.OnFileUploadFinished(fileMeta)
 	if err != nil {
 		errCode = -6
 		return
@@ -134,7 +136,7 @@ func DoUploadHandler(c *gin.Context) {
 
 	// 7. 更新用户文件表
 	username := c.Request.FormValue("username")
-	upRes, err := dbcli.OnUserFileUploadFinished(username, fileMeta)
+	upRes, err := dbClient.OnUserFileUploadFinished(username, fileMeta)
 	if err != nil && upRes.Suc {
 		errCode = 0
 	} else {
@@ -144,13 +146,16 @@ func DoUploadHandler(c *gin.Context) {
 
 // TryFastUploadHandler 尝试秒传接口
 func TryFastUploadHandler(c *gin.Context) {
+	dbClient := dbproxy.NewDbProxyClient()
+	defer dbClient.Conn.Close()
+
 	// 1. 解析请求参数
 	username := c.Request.FormValue("username")
 	filehash := c.Request.FormValue("filehash")
 	filename := c.Request.FormValue("filename")
 
 	// 2. 从文件表中查询相同的hash的文件记录
-	fileMetaResp, err := dbcli.GetFileMeta(filehash)
+	fileMetaResp, err := dbClient.GetFileMeta(filehash)
 	if err != nil {
 		log.Println(err.Error())
 		c.Status(http.StatusInternalServerError)
@@ -168,9 +173,9 @@ func TryFastUploadHandler(c *gin.Context) {
 	}
 
 	// 4. 上传过则将文件信息写入用户文件表，返回成功
-	fmeta := dbcli.TableFileToFileMeta(fileMetaResp.Data.(orm.TableFile))
+	fmeta := dbClient.TableFileToFileMeta(fileMetaResp.Data.(orm.TableFile))
 	fmeta.FileName = filename
-	upRes, err := dbcli.OnUserFileUploadFinished(username, fmeta)
+	upRes, err := dbClient.OnUserFileUploadFinished(username, fmeta)
 	if err != nil && upRes.Suc {
 		resp := util.RespMsg{
 			Code: 0,

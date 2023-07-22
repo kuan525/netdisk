@@ -2,7 +2,7 @@ package mapper
 
 import (
 	"errors"
-	"github.com/kuan525/netdisk/dbclient/orm"
+	"github.com/kuan525/netdisk/service/dbproxy/orm"
 	"reflect"
 )
 

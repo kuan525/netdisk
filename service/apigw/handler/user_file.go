@@ -3,7 +3,8 @@ package handler
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	accProto "github.com/kuan525/netdisk/proto/account"
+	"github.com/kuan525/netdisk/client/account"
+	userProto "github.com/kuan525/netdisk/client/account/proto"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,7 +15,10 @@ func FileQueryHandler(c *gin.Context) {
 	limitCnt, _ := strconv.Atoi(c.Request.FormValue("limit"))
 	username := c.Request.FormValue("username")
 
-	rpcResp, err := userCli.UserFiles(context.TODO(), &accProto.ReqUserFile{
+	userClient := account.NewAccountClient()
+	defer userClient.Conn.Close()
+
+	rpcResp, err := userClient.Client.UserFiles(context.TODO(), &userProto.ReqUserFile{
 		Username: username,
 		Limit:    int32(limitCnt),
 	})
@@ -38,12 +42,15 @@ func FileMetaUpdateHandler(c *gin.Context) {
 	username := c.Request.FormValue("username")
 	newFileName := c.Request.FormValue("filename")
 
+	userClient := account.NewAccountClient()
+	defer userClient.Conn.Close()
+
 	if opType != "0" || len(newFileName) < 1 {
 		c.Status(http.StatusForbidden)
 		return
 	}
 
-	rpcResp, err := userCli.UserFileRename(context.TODO(), &accProto.ReqUserFileRename{
+	rpcResp, err := userClient.Client.UserFileRename(context.TODO(), &userProto.ReqUserFileRename{
 		Username:    username,
 		Filehash:    fileSha1,
 		NewFileName: newFileName,
@@ -60,4 +67,3 @@ func FileMetaUpdateHandler(c *gin.Context) {
 	}
 	c.Data(http.StatusOK, "application/json", rpcResp.FileData)
 }
-
