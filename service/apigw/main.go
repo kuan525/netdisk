@@ -35,5 +35,5 @@ func main() {
 	go startRPCService()
 
 	r := route.Router()
-	r.Run(":8080")
+	r.Run("localhost:8080")
 }
