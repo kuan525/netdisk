@@ -23,7 +23,6 @@ func main() {
 	}
 
 	grpcSrv := grpc.NewServer(
-		//grpc.Address(":9000"),
 		grpc.Middleware(
 			recovery.Recovery(),
 			logging.Server(logger),

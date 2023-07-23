@@ -13,22 +13,26 @@ check_process() {
     fi
 }
 
-# 编译service可执行文件
+# 编译service可执行文件, 在netdisk目录下
 build_service() {
-    go build -o service/bin/$1 service/$1/main.go
+    cd service/$1
+    go build
+    mv $1 ../bin
+    cd ../..
     resbin=`ls service/bin/ | grep $1`
     echo -e "\033[32m 编译完成: \033[0m service/bin/$resbin"
+
 }
 
 # 启动service
 run_service() {
-    nohup ./service/bin/$1 --registry=consul >> $logpath/$1.log 2>&1 &
+    ./service/bin/$1 --registry=consul >> $logpath/$1.log 2>&1 &
     sleep 1
     check_process $1
 }
 
 # 创建运行日志目录
-logpath=/data/log/netdisk
+logpath=/Users/kuan525/TODO/log
 mkdir -p $logpath
 
 # 切换到工程根目录
@@ -46,6 +50,11 @@ transfer
 account
 apigw
 "
+
+# 启动rabbitmq
+#rabbitmq-server
+# 启动consul
+#consul agent -dev
 
 # 执行编译service
 mkdir -p service/bin/ && rm -f service/bin/*

@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/kuan525/netdisk/service/upload/api"
+	"upload/api"
 )
 
 // Router 路由表配置
