@@ -1,7 +1,7 @@
 *.log
 .idea/
 .vscode/
-#go.mod
-#go.sum
+go.mod
+go.sum
 deploy/
 doc/
