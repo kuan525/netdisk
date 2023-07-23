@@ -1,4 +1,4 @@
-package transfer
+package main
 
 import (
 	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
@@ -7,8 +7,8 @@ import (
 	"github.com/hashicorp/consul/api"
 	"github.com/kuan525/netdisk/config"
 	"github.com/kuan525/netdisk/mq"
-	"github.com/kuan525/netdisk/service/transfer/process"
 	"os"
+	"transfer/process"
 )
 
 func startRPCService() {

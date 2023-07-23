@@ -4,7 +4,7 @@ import (
 	"context"
 
 	upProto "github.com/kuan525/netdisk/client/upload/proto"
-	cfg "github.com/kuan525/netdisk/service/upload/config"
+	cfg "github.com/kuan525/netdisk/config"
 )
 
 type Upload struct {

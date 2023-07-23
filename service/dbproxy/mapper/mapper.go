@@ -1,8 +1,8 @@
 package mapper
 
 import (
+	"dbproxy/orm"
 	"errors"
-	"github.com/kuan525/netdisk/service/dbproxy/orm"
 	"reflect"
 )
 

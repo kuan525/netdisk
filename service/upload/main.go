@@ -11,9 +11,9 @@ import (
 	upProto "github.com/kuan525/netdisk/client/upload/proto"
 	cfg "github.com/kuan525/netdisk/config"
 	"github.com/kuan525/netdisk/mq"
-	"github.com/kuan525/netdisk/service/upload/route"
-	upRpc "github.com/kuan525/netdisk/service/upload/rpc"
 	"os"
+	"upload/route"
+	upRpc "upload/rpc"
 )
 
 func startRPCService() {

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	cfg "github.com/kuan525/netdisk/service/dbproxy/config"
+	cfg "github.com/kuan525/netdisk/config"
 	"log"
 	"os"
 )

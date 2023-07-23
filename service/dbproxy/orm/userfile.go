@@ -1,7 +1,7 @@
 package orm
 
 import (
-	mydb "github.com/kuan525/netdisk/service/dbproxy/conn"
+	mydb "dbproxy/conn"
 	"log"
 	"time"
 )
