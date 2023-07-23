@@ -3,10 +3,10 @@ package rpc
 import (
 	"bytes"
 	"context"
-	"dbproxy/mapper"
-	"dbproxy/orm"
 	"encoding/json"
 	dbProxy "github.com/kuan525/netdisk/client/dbproxy/proto"
+	"github.com/kuan525/netdisk/common/mapper"
+	"github.com/kuan525/netdisk/common/orm"
 )
 
 // DBProxy 结构体

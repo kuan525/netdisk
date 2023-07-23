@@ -1,7 +1,6 @@
 package main
 
 import (
-	dbConn "dbproxy/conn"
 	dbRpc "dbproxy/rpc"
 	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
 	"github.com/go-kratos/kratos/v2"
@@ -10,6 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/hashicorp/consul/api"
+	dbConn "github.com/kuan525/netdisk/common/conn"
 	"os"
 
 	dbproto "github.com/kuan525/netdisk/client/dbproxy/proto"
