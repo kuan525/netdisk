@@ -7,7 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/hashicorp/consul/api"
 	dbProto "github.com/kuan525/netdisk/client/dbproxy/proto"
-	"github.com/kuan525/netdisk/service/dbproxy/orm"
+	"github.com/kuan525/netdisk/common/orm"
 	"github.com/mitchellh/mapstructure"
 	ggrpc "google.golang.org/grpc"
 	"log"
