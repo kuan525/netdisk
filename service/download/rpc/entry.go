@@ -4,7 +4,7 @@ import (
 	"context"
 
 	dlProto "github.com/kuan525/netdisk/client/download/proto"
-	cfg "github.com/kuan525/netdisk/service/download/config"
+	cfg "github.com/kuan525/netdisk/config"
 )
 
 type Download struct {
