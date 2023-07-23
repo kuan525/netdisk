@@ -1,10 +1,10 @@
 package route
 
 import (
+	"apigw/handler"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/kuan525/netdisk/asset"
-	"github.com/kuan525/netdisk/service/apigw/handler"
 	assetfs "github.com/moxiaomomo/go-bindata-assetfs"
 	"net/http"
 	"strings"

@@ -1,11 +1,11 @@
-package apigw
+package main
 
 import (
+	"apigw/route"
 	"github.com/go-kratos/kratos/contrib/registry/consul/v2"
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hashicorp/consul/api"
-	"github.com/kuan525/netdisk/service/apigw/route"
 	"os"
 )
 
@@ -35,5 +35,5 @@ func main() {
 	go startRPCService()
 
 	r := route.Router()
-	r.Run(":8080")
+	r.Run(":8081")
 }
