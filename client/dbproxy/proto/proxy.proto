@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package go.micro.service.dbproxy;
 
-option go_package= "../dbproxy";
+option go_package= "../proto";
 
 service DBProxyService {
   // 请求执行sql动作

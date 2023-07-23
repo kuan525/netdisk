@@ -10,7 +10,8 @@ var (
 	// Cli : redis client 客户端
 	Cli       *redis.Client
 	redisHost = "127.0.0.1:6379"
-	redisPwd  = "redis_112525"
+	//redisPwd  = "redis_112525"
+	redisPwd = ""
 	// ctx 空上下文
 	ctx = context.Background()
 )

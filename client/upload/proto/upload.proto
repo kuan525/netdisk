@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package go.micro.service.upload;
 
-option go_package = "../upload";
+option go_package = "../proto";
 
 service UploadService {
   // 获取上传入口地址

@@ -10,7 +10,6 @@ import (
 	"github.com/hashicorp/consul/api"
 	dbConn "github.com/kuan525/netdisk/service/dbproxy/conn"
 	dbRpc "github.com/kuan525/netdisk/service/dbproxy/rpc"
-	_ "github.com/micro/go-plugins/registry/kubernetes"
 	"os"
 
 	dbproto "github.com/kuan525/netdisk/client/dbproxy/proto"
