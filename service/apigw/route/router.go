@@ -2,7 +2,6 @@ package route
 
 import (
 	"apigw/handler"
-	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/kuan525/netdisk/asset"
 	assetfs "github.com/moxiaomomo/go-bindata-assetfs"
@@ -45,9 +44,9 @@ func BinaryFileSystem(root string) *binaryFileSystem {
 func Router() *gin.Engine {
 	router := gin.Default()
 
-	// router.Static("/static/", "./static")
+	router.Static("/static/", "../../static")
 	// 将静态文件打包到bin文件
-	router.Use(static.Serve("/static/", BinaryFileSystem("static")))
+	//router.Use(static.Serve("/static/", BinaryFileSystem("static")))
 
 	// 注册
 	router.GET("/user/signup", handler.SigninHandler)

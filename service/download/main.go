@@ -36,7 +36,7 @@ func startRPCService() {
 
 	r := consul.New(consulClient)
 	app := kratos.New(
-		kratos.Name("go.micro.service.download"),
+		kratos.Name("go.kratos.service.download"),
 		kratos.Server(
 			grpcSrv,
 		),

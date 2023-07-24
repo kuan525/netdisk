@@ -13,6 +13,7 @@ type Upload struct {
 
 // UploadEntry 获取上传入口
 func (u *Upload) UploadEntry(ctx context.Context, req *upProto.ReqEntry) (res *upProto.RespEntry, err error) {
+	res = new(upProto.RespEntry)
 	res.Entry = cfg.UploadEntry
 	return
 }

@@ -9,9 +9,8 @@ import (
 // OnUserFileUploadFinished 更新用户文件表
 func OnUserFileUploadFinished(username, filehash, filename string, filesize int64) (res ExecResult) {
 	stmt, err := mydb.DBConn().Prepare(
-		"insert ignore into tbl_user_file " +
-			"(`user_name`, `file_sha1`, `file_name`, `file_size`, `upload_at`) " +
-			"values (?,?,?,?,?)")
+		"insert ignore into tbl_user_file (`user_name`,`file_sha1`,`file_name`," +
+			"`file_size`,`upload_at`) values (?,?,?,?,?)")
 	if err != nil {
 		log.Println(err.Error())
 		res.Suc = false
@@ -34,9 +33,8 @@ func OnUserFileUploadFinished(username, filehash, filename string, filesize int6
 // QueryUserFileMetas 批量获取用户文件信息
 func QueryUserFileMetas(username string, limit int64) (res ExecResult) {
 	stmt, err := mydb.DBConn().Prepare(
-		"select file_sha1, file_name, file_size, upload_at, last_update " +
-			"from tbl_user_file " +
-			"where user_name=? limit ?")
+		"select file_sha1,file_name,file_size,upload_at," +
+			"last_update from tbl_user_file where user_name=? limit ?")
 	if err != nil {
 		log.Println(err.Error())
 		res.Suc = false
@@ -56,7 +54,8 @@ func QueryUserFileMetas(username string, limit int64) (res ExecResult) {
 	var userFiles []TableUserFile
 	for rows.Next() {
 		ufile := TableUserFile{}
-		err = rows.Scan(&ufile.FileHash, &ufile.FileName, &ufile.FileSize, &ufile.UploadAt, &ufile.LastUpdated)
+		err = rows.Scan(&ufile.FileHash, &ufile.FileName, &ufile.FileSize,
+			&ufile.UploadAt, &ufile.LastUpdated)
 		if err != nil {
 			log.Println(err.Error())
 			break
@@ -94,8 +93,7 @@ func DeleteUserFile(username, filehash string) (res ExecResult) {
 // RenameFileName 文件重命名
 func RenameFileName(username, filehash, filename string) (res ExecResult) {
 	stmt, err := mydb.DBConn().Prepare(
-		"update tbl_user_file set file_name=? " +
-			"where user_name=? and file_sha1=? limit 1")
+		"update tbl_user_file set file_name=? where user_name=? and file_sha1=? limit 1")
 	if err != nil {
 		log.Println(err.Error())
 		res.Suc = false
@@ -118,9 +116,8 @@ func RenameFileName(username, filehash, filename string) (res ExecResult) {
 // QueryUserFileMeta 获取用户单个文件信息
 func QueryUserFileMeta(username string, filehash string) (res ExecResult) {
 	stmt, err := mydb.DBConn().Prepare(
-		"select file_sha1, file_name, file_size, upload_at, last_update " +
-			"from tb_user_file " +
-			"where user_name=? and file_sha1=?")
+		"select file_sha1,file_name,file_size,upload_at," +
+			"last_update from tbl_user_file where user_name=? and file_sha1=?  limit 1")
 	if err != nil {
 		res.Suc = false
 		res.Msg = err.Error()
@@ -137,7 +134,8 @@ func QueryUserFileMeta(username string, filehash string) (res ExecResult) {
 
 	ufile := TableUserFile{}
 	if rows.Next() {
-		err = rows.Scan(&ufile.FileHash, &ufile.FileName, &ufile.FileSize, &ufile.UploadAt, &ufile.LastUpdated)
+		err = rows.Scan(&ufile.FileHash, &ufile.FileName, &ufile.FileSize,
+			&ufile.UploadAt, &ufile.LastUpdated)
 		if err != nil {
 			log.Println(err.Error())
 			res.Suc = false

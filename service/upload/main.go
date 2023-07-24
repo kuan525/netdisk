@@ -26,7 +26,6 @@ func startRPCService() {
 	}
 
 	grpcSrv := grpc.NewServer(
-		//grpc.Address(":9000"),
 		grpc.Middleware(
 			recovery.Recovery(),
 			logging.Server(logger),
@@ -36,7 +35,7 @@ func startRPCService() {
 
 	r := consul.New(consulClient)
 	app := kratos.New(
-		kratos.Name("go.micro.service.upload"),
+		kratos.Name("go.kratos.service.upload"),
 		kratos.Server(
 			grpcSrv,
 		),
@@ -64,5 +63,5 @@ func main() {
 	go startAPIService()
 
 	// rpc 服务
-	startAPIService()
+	startRPCService()
 }

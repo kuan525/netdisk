@@ -25,7 +25,6 @@ func startRpcService() {
 	}
 
 	grpcSrv := grpc.NewServer(
-		//grpc.Address(":9000"), // 默认随机
 		grpc.Middleware(
 			recovery.Recovery(),
 			logging.Server(logger),
@@ -35,7 +34,7 @@ func startRpcService() {
 
 	r := consul.New(consulClient)
 	app := kratos.New(
-		kratos.Name("go.micro.service.dbproxy"),
+		kratos.Name("go.kratos.service.dbproxy"),
 		kratos.Server(
 			grpcSrv,
 		),

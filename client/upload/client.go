@@ -26,7 +26,7 @@ func NewAccountClient() *uploadClient {
 	// new grpc client
 	conn, err := grpc.DialInsecure(
 		context.Background(),
-		grpc.WithEndpoint("discovery:///go.micro.service.upload"),
+		grpc.WithEndpoint("discovery:///go.kratos.service.upload"),
 		grpc.WithDiscovery(r),
 	)
 	if err != nil {

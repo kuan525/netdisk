@@ -26,7 +26,7 @@ func NewAccountClient() *UserClient {
 	// new grpc client
 	conn, err := grpc.DialInsecure(
 		context.Background(),
-		grpc.WithEndpoint("discovery:///go.micro.service.user"),
+		grpc.WithEndpoint("discovery:///go.kratos.service.user"),
 		grpc.WithDiscovery(r),
 	)
 	if err != nil {

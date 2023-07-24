@@ -39,7 +39,7 @@ func NewDbProxyClient() *DbClient {
 	// new grpc client
 	conn, err := grpc.DialInsecure(
 		context.Background(),
-		grpc.WithEndpoint("discovery:///go.micro.service.dbproxy"),
+		grpc.WithEndpoint("discovery:///go.kratos.service.dbproxy"),
 		grpc.WithDiscovery(r),
 	)
 	if err != nil {

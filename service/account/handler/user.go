@@ -8,6 +8,7 @@ import (
 	"github.com/kuan525/netdisk/common"
 	cfg "github.com/kuan525/netdisk/config"
 	"github.com/kuan525/netdisk/util"
+	"log"
 	"time"
 )
 
@@ -26,6 +27,7 @@ func GetToken(username string) string {
 
 // Signup 处理用户注册请求
 func (u *User) Signup(ctx context.Context, req *userProto.ReqSignup) (res *userProto.RespSignup, err error) {
+	res = new(userProto.RespSignup)
 	username := req.Username
 	passwd := req.Password
 
@@ -42,8 +44,10 @@ func (u *User) Signup(ctx context.Context, req *userProto.ReqSignup) (res *userP
 	dbClient := dbproxy.NewDbProxyClient()
 	defer dbClient.Conn.Close()
 
+	log.Println("encPasswd: ", encPasswd)
 	dbResp, err := dbClient.UserSignup(username, encPasswd)
-	if err != nil && dbResp.Suc {
+	log.Println("dbResp", err, dbResp.Suc)
+	if err == nil && dbResp.Suc {
 		res.Code = common.StatusOk
 		res.Message = "注册成功"
 	} else {
@@ -55,36 +59,45 @@ func (u *User) Signup(ctx context.Context, req *userProto.ReqSignup) (res *userP
 
 // Signin 处理用户登陆请求
 func (u *User) Signin(ctx context.Context, req *userProto.ReqSignin) (res *userProto.RespSignin, err error) {
+	res = new(userProto.RespSignin)
 	username := req.Username
 	password := req.Password
+
+	log.Println("account: ", username, password)
 
 	encPasswd := util.Sha1([]byte(password + cfg.PasswordSalt))
 
 	dbClient := dbproxy.NewDbProxyClient()
 	defer dbClient.Conn.Close()
+
 	// 1. 检验用户名以及密码
-	dbResp, err := dbClient.UserSignup(username, encPasswd)
+	dbResp, err := dbClient.UserSignin(username, encPasswd)
+	log.Println("dbResp: ", dbResp)
 	if err != nil || !dbResp.Suc {
 		res.Code = common.StatusLoginFailed
+		log.Println(res)
 		return
 	}
 
 	// 2. 生成访问凭证（token）
 	token := GetToken(username)
 	upRes, err := dbClient.UpdateToken(username, token)
-	if err != nil || upRes.Suc {
+	if err != nil || !upRes.Suc {
 		res.Code = common.StatusServerError
+		log.Println(res)
 		return
 	}
 
 	// 3. 登陆成功，返回token
 	res.Code = common.StatusOk
 	res.Token = token
+	log.Println(res)
 	return
 }
 
 // UserInfo 查询用户信息
 func (u *User) UserInfo(ctx context.Context, req *userProto.ReqUserInfo) (res *userProto.RespUserInfo, err error) {
+	res = new(userProto.RespUserInfo)
 	dbClient := dbproxy.NewDbProxyClient()
 	defer dbClient.Conn.Close()
 

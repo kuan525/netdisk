@@ -56,6 +56,23 @@ apigw
 # 启动consul
 #consul agent -dev
 
+# 检测端口是否被使用
+check_port() {
+    port=$1
+    if lsof -i :$port >/dev/null; then
+        echo "Port $port is in use. Closing the port..."
+        sudo kill $(sudo lsof -t -i :$port)
+        echo "Port $port has been closed."
+    else
+        echo "Port $port is not in use."
+    fi
+}
+
+# 检测并关闭端口
+check_port 8080
+check_port 28080
+check_port 38080
+
 # 执行编译service
 mkdir -p service/bin/ && rm -f service/bin/*
 for service in $services

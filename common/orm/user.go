@@ -8,7 +8,7 @@ import (
 // UserSignup 通过用户名及密码完成user表的注册操作
 func UserSignup(username string, passwd string) (res ExecResult) {
 	stmt, err := mydb.DBConn().Prepare(
-		"insert ignore into tbl_user (`user_name`, `user_pwd`) values (?, ?)")
+		"insert ignore into tbl_user (`user_name`,`user_pwd`) values (?,?)")
 	if err != nil {
 		log.Println("Failed to insert, err:" + err.Error())
 		res.Suc = false
@@ -19,12 +19,14 @@ func UserSignup(username string, passwd string) (res ExecResult) {
 
 	ret, err := stmt.Exec(username, passwd)
 	if err != nil {
-		log.Println("Filed to insert, err:" + err.Error())
+		log.Println("Failed to insert, err:" + err.Error())
 		res.Suc = false
 		res.Msg = err.Error()
 		return
 	}
-	if rowAffected, err := ret.RowsAffected(); nil == err && rowAffected > 0 {
+	rowsAffected, err := ret.RowsAffected()
+	log.Println("ret.RowsAffected()", rowsAffected, err)
+	if nil == err && rowsAffected > 0 {
 		res.Suc = true
 		return
 	}
@@ -72,7 +74,7 @@ func UserSignin(username string, encpwd string) (res ExecResult) {
 // UpdateToken 刷新用户登陆的token
 func UpdateToken(username string, token string) (res ExecResult) {
 	stmt, err := mydb.DBConn().Prepare(
-		"replace into tbl_user_token (`user_name`, `user_token`) values (?,?)")
+		"replace into tbl_user_token (`user_name`,`user_token`) values (?,?)")
 	if err != nil {
 		log.Println(err.Error())
 		res.Suc = false
@@ -97,9 +99,11 @@ func GetUserInfo(username string) (res ExecResult) {
 	user := TableUser{}
 
 	stmt, err := mydb.DBConn().Prepare(
-		"select user_name, signup_at from tbl_user where user_name=? limit 1")
+		"select user_name,signup_at from tbl_user where user_name=? limit 1")
 	if err != nil {
 		log.Println(err.Error())
+		// error不为nil, 返回时user应当置为nil
+		//return user, err
 		res.Suc = false
 		res.Msg = err.Error()
 		return
@@ -113,7 +117,6 @@ func GetUserInfo(username string) (res ExecResult) {
 		res.Msg = err.Error()
 		return
 	}
-
 	res.Suc = true
 	res.Data = user
 	return

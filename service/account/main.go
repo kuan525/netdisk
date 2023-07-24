@@ -33,7 +33,7 @@ func main() {
 
 	r := consul.New(consulClient)
 	app := kratos.New(
-		kratos.Name("go.micro.service.user"),
+		kratos.Name("go.kratos.service.user"),
 		kratos.Server(
 			grpcSrv,
 		),

@@ -51,6 +51,7 @@ func SigninHandler(c *gin.Context) {
 func DoSigninHandler(c *gin.Context) {
 	username := c.Request.FormValue("username")
 	password := c.Request.FormValue("password")
+	log.Println("BBB ", username, password)
 
 	userClient := account.NewAccountClient()
 	defer userClient.Conn.Close()
@@ -59,6 +60,7 @@ func DoSigninHandler(c *gin.Context) {
 		Username: username,
 		Password: password,
 	})
+	log.Println("rpcResp: ", rpcResp)
 
 	if err != nil {
 		log.Println(err.Error())

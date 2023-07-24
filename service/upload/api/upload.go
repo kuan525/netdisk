@@ -40,6 +40,7 @@ func DoUploadHandler(c *gin.Context) {
 			})
 		}
 	}()
+
 	dbClient := dbproxy.NewDbProxyClient()
 	defer dbClient.Conn.Close()
 
@@ -137,7 +138,7 @@ func DoUploadHandler(c *gin.Context) {
 	// 7. 更新用户文件表
 	username := c.Request.FormValue("username")
 	upRes, err := dbClient.OnUserFileUploadFinished(username, fileMeta)
-	if err != nil && upRes.Suc {
+	if err == nil && upRes.Suc {
 		errCode = 0
 	} else {
 		errCode = -6
@@ -176,7 +177,7 @@ func TryFastUploadHandler(c *gin.Context) {
 	fmeta := dbClient.TableFileToFileMeta(fileMetaResp.Data.(orm.TableFile))
 	fmeta.FileName = filename
 	upRes, err := dbClient.OnUserFileUploadFinished(username, fmeta)
-	if err != nil && upRes.Suc {
+	if err == nil && upRes.Suc {
 		resp := util.RespMsg{
 			Code: 0,
 			Msg:  "秒传成功",

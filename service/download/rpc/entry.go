@@ -13,6 +13,7 @@ type Download struct {
 
 // DownloadEntry 获取下载入口
 func (u *Download) DownloadEntry(ctx context.Context, req *dlProto.ReqEntry) (res *dlProto.RespEntry, err error) {
+	res = new(dlProto.RespEntry)
 	res.Entry = cfg.DownloadEntry
 	return
 }

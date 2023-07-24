@@ -22,7 +22,7 @@ func startRPCService() {
 
 	r := consul.New(consulClient)
 	app := kratos.New(
-		kratos.Name("go.micro.service.transfer"),
+		kratos.Name("go.kratos.service.transfer"),
 		kratos.Server(),
 		kratos.Registrar(r),
 	)

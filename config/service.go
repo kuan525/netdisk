@@ -10,10 +10,10 @@ const (
 	UploadServiceHost = "localhost:28080"
 
 	// UploadLBHost 上传服务LB地址
-	UploadLBHost = "http://upload.netdisk.com"
+	UploadLBHost = "http://localhost:28080"
 	// DownloadLBHost 下载服务LB地址
-	DownloadLBHost = "http://download.netdisk.com"
-	
+	DownloadLBHost = "http://localhost:38080"
+
 	// DownloadEntry 配置下载入口地址
 	DownloadEntry = "localhost:38080"
 	// DownloadServiceHost 下载服务监听的地址

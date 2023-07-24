@@ -12,7 +12,7 @@ import (
 var db *sql.DB
 
 func InitDBConn() {
-	db, _ := sql.Open("mysql", cfg.MySQLSource)
+	db, _ = sql.Open("mysql", cfg.MySQLSource)
 	// "database/sql" 自带连接池，这里设置连接最大数量
 	db.SetMaxOpenConns(1000)
 	err := db.Ping()
